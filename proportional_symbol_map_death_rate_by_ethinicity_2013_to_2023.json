@@ -1,0 +1,154 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 1300,
+  "height": 700,
+  "background": "#f5deb3",
+  "projection": {"type": "mercator", "center": [111, 4], "scale": 2600},
+  "view": {"stroke": null},
+  "title": {
+    "text": {
+      "signal": "'Deaths in Malaysian States by Ethnicity and Gender (' + year_choice + ')'"
+    },
+    "fontSize": 22,
+    "fontWeight": "bold",
+    "anchor": "middle",
+    "color": "#4b3832"
+  },
+  "params": [
+    {
+      "name": "year_choice",
+      "value": 2023,
+      "bind": {
+        "input": "select",
+        "name": "Select Year: ",
+        "options": [
+          2013,
+          2014,
+          2015,
+          2016,
+          2017,
+          2018,
+          2019,
+          2020,
+          2021,
+          2022,
+          2023
+        ]
+      }
+    },
+    {
+      "name": "ethnic_choice",
+      "value": "bumi_malay",
+      "bind": {
+        "input": "select",
+        "name": "Select Ethnicity: ",
+        "options": ["bumi_malay", "bumi_other", "chinese", "indian"]
+      }
+    },
+    {
+      "name": "gender_choice",
+      "value": "both",
+      "bind": {
+        "input": "select",
+        "name": "Select Gender: ",
+        "options": ["both", "male", "female"]
+      }
+    }
+  ],
+  "layer": [
+    {
+      "data": {"graticule": {"step": [5, 5]}},
+      "mark": {
+        "type": "geoshape",
+        "filled": false,
+        "stroke": "darkgoldenrod",
+        "strokeWidth": 0.6
+      }
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/Matessh/FIT3179-Week-9-Homework/main/malaysia-states.topojson",
+        "format": {"type": "topojson", "feature": "states"}
+      },
+      "mark": {"type": "geoshape", "fill": "lightgrey", "stroke": "#373036"}
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/Matessh/Data-Visualisation-2-/refs/heads/main/death_sex_ethnic_state_cleaned.csv",
+        "format": {"type": "csv"}
+      },
+      "transform": [
+        {"calculate": "year(datum.date)", "as": "year_extracted"},
+        {"filter": "datum.year_extracted == year_choice"},
+        {"filter": "datum.ethnicity == ethnic_choice"},
+        {
+          "filter": "(gender_choice == 'both' ? datum.sex == 'both' : datum.sex == gender_choice)"
+        },
+        {"calculate": "toNumber(datum.abs)", "as": "total_deaths"},
+        {
+          "lookup": "state",
+          "from": {
+            "data": {
+              "url": "https://raw.githubusercontent.com/Matessh/FIT3179-Week-9-Homework/main/malaysia-states.topojson",
+              "format": {"type": "topojson", "feature": "states"}
+            },
+            "key": "properties.Name",
+            "fields": ["geometry"]
+          }
+        },
+        {"calculate": "geoCentroid(null, datum.geometry)", "as": "centroid"},
+        {"calculate": "datum.centroid[0]", "as": "longitude"},
+        {"calculate": "datum.centroid[1]", "as": "latitude"},
+        {"filter": "datum.longitude != null && datum.latitude != null"}
+      ],
+      "mark": {
+        "type": "circle",
+        "stroke": "white",
+        "strokeWidth": 0.3,
+        "fillOpacity": 0.75
+      },
+      "encoding": {
+        "longitude": {"field": "longitude"},
+        "latitude": {"field": "latitude"},
+        "size": {
+          "field": "total_deaths",
+          "type": "quantitative",
+          "scale": {"type": "sqrt", "domain": [0, 20000], "range": [50, 2500]},
+          "legend": {
+            "title": "Total Deaths",
+            "orient": "right",
+            "values": [100, 5000, 10000, 15000, 20000],
+            "symbolFillColor": {
+              "signal": "ethnic_choice == 'bumi_malay' ? '#cc0000' : ethnic_choice == 'bumi_other' ? '#009E73' : ethnic_choice == 'chinese' ? '#A0522D' : ethnic_choice == 'indian' ? '#CC79A7' : 'gray'"
+            }
+          },
+          "title": "Total Deaths"
+        },
+        "color": {
+          "field": "ethnicity",
+          "type": "nominal",
+          "scale": {
+            "domain": ["bumi_malay", "bumi_other", "chinese", "indian"],
+            "range": ["#cc0000", "#009E73", "#A0522D", "#CC79A7"]
+          },
+          "legend": {"title": "Ethnicity"}
+        },
+        "opacity": {
+          "condition": [
+            {"test": "datum.sex == 'male'", "value": 0.9},
+            {"test": "datum.sex == 'female'", "value": 0.65}
+          ],
+          "value": 0.8
+        },
+        "tooltip": [
+          {"field": "state", "title": "State"},
+          {"field": "ethnicity", "title": "Ethnicity"},
+          {"field": "sex", "title": "Gender"},
+          {"field": "total_deaths", "title": "Total Deaths", "format": ","},
+          {"field": "date", "title": "Date"}
+        ]
+      }
+    }
+  ],
+  "config": {}
+}
