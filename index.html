@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title> Malaysian Death Data Visualisations</title>
+
+```
+<!-- Load Vega libraries -->
+<script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #faf9f6;
+    margin: 0;
+    padding: 30px;
+  }
+
+  h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 10px;
+  }
+
+  h2 {
+    text-align: center;
+    color: #4b3832;
+    margin-top: 5px;
+    font-weight: normal;
+  }
+
+  /* ✅ One column stacked layout */
+  .viz-container {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 1200px;
+    margin: 40px auto; /* Centers and spaces each viz */
+  }
+
+  .viz-title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;
+    color: #34495e;
+    margin-bottom: 15px;
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+
+  footer {
+    text-align: center;
+    font-size: 13px;
+    margin-top: 60px;
+    color: #777;
+  }
+</style>
+```
+
+  </head>
+
+  <body>
+    <h1>FIT3179 Data Visualisation</h1>
+    <h2> Interactive Visualisations of Death Statistics in Malaysia</h2>
+
+<!-- Map 1 -->
+<div class="viz-container">
+  
+  <div id="map1"></div>
+</div>
+
+<!-- Map 2 -->
+<div class="viz-container">
+  <div id="map2"></div>
+</div>
+
+<!-- Line Graph -->
+<div class="viz-container">
+  <div id="lineGraph"></div>
+</div>
+
+<footer>
+  Created by Matessh Subramaniam | Monash University | FIT3179 Data Visualisation 2
+</footer>
+
+<script type="text/javascript">
+  // Embed Map 1
+  vegaEmbed(
+    "#map1",
+    "https://raw.githubusercontent.com/Matessh/Data-Visualisation-2-/refs/heads/main/malaysian_death_rate_2023_map.json",
+    { actions: false }
+  ).catch(console.error);
+
+  // Embed Map 2
+  vegaEmbed(
+    "#map2",
+    "https://raw.githubusercontent.com/Matessh/Data-Visualisation-2-/refs/heads/main/proportional_symbol_map_death_rate_by_ethinicity_2013_to_2023.json",
+    { actions: false }
+  ).catch(console.error);
+
+  // Embed Line Graph
+  vegaEmbed(
+    "#lineGraph",
+    "https://raw.githubusercontent.com/Matessh/Data-Visualisation-2-/refs/heads/main/icon_line_graph_suicide_rate_2000_to_2021.json",
+    { actions: false }
+  ).catch(console.error);
+</script>
+
+
+  </body>
+</html>
