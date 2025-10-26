@@ -1,0 +1,305 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 1300,
+  "height": 700,
+  "background": "#fff8dcee",
+  "projection": {"type": "mercator", "center": [111, 4], "scale": 2600},
+  "view": {"stroke": null},
+  "title": {
+    "text": {
+      "signal": "'Deaths in Malaysian States by Ethnicity and Gender (' + year_choice + ')'"
+    },
+    "fontSize": 24,
+    "fontWeight": "bold",
+    "font": "georgia",
+    "anchor": "middle",
+    "color": "#4b3832",
+    "subtitle": [
+      "Use the filters to explore data by year, ethnicity, and gender"
+    ],
+    "subtitleFont": "arial",
+    "subtitleFontSize": 14,
+    "subtitleColor": "#4b3832"
+  },
+  "params": [
+    {
+      "name": "year_choice",
+      "value": 2023,
+      "bind": {
+        "input": "select",
+        "name": "Select Year: ",
+        "options": [
+          2013,
+          2014,
+          2015,
+          2016,
+          2017,
+          2018,
+          2019,
+          2020,
+          2021,
+          2022,
+          2023
+        ]
+      }
+    },
+    {
+      "name": "ethnic_choice",
+      "value": "bumi_malay",
+      "bind": {
+        "input": "select",
+        "name": "Select Ethnicity: ",
+        "options": ["bumi_malay", "bumi_other", "chinese", "indian"]
+      }
+    },
+    {
+      "name": "gender_choice",
+      "value": "both",
+      "bind": {
+        "input": "select",
+        "name": "Select Gender: ",
+        "options": ["both", "male", "female"]
+      }
+    }
+  ],
+  "layer": [
+    {
+      "data": {"graticule": {"step": [5, 5]}},
+      "mark": {
+        "type": "geoshape",
+        "filled": false,
+        "stroke": "darkgoldenrod",
+        "strokeWidth": 0.6
+      }
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/Matessh/FIT3179-Week-9-Homework/main/malaysia-states.topojson",
+        "format": {"type": "topojson", "feature": "states"}
+      },
+      "mark": {"type": "geoshape", "fill": "lightgrey", "stroke": "#373036"}
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/Matessh/Data-Visualisation-2-/main/death_sex_ethnic_state_cleaned.csv",
+        "format": {"type": "csv"}
+      },
+      "transform": [
+        {"calculate": "year(datum.date)", "as": "year_extracted"},
+        {"filter": "datum.year_extracted == year_choice"},
+        {"filter": "datum.ethnicity == ethnic_choice"},
+        {
+          "filter": "(gender_choice == 'both' ? datum.sex == 'both' : datum.sex == gender_choice)"
+        },
+        {"calculate": "toNumber(datum.abs)", "as": "total_deaths"},
+        {
+          "lookup": "state",
+          "from": {
+            "data": {
+              "url": "https://raw.githubusercontent.com/Matessh/FIT3179-Week-9-Homework/main/malaysia-states.topojson",
+              "format": {"type": "topojson", "feature": "states"}
+            },
+            "key": "properties.Name",
+            "fields": ["geometry"]
+          }
+        },
+        {"calculate": "geoCentroid(null, datum.geometry)", "as": "centroid"},
+        {"calculate": "datum.centroid[0]", "as": "longitude"},
+        {"calculate": "datum.centroid[1]", "as": "latitude"},
+        {"filter": "datum.longitude != null && datum.latitude != null"}
+      ],
+      "mark": {
+        "type": "point",
+        "stroke": "white",
+        "strokeWidth": 0.3,
+        "fillOpacity": 0.75,
+        "filled": true
+      },
+      "encoding": {
+        "longitude": {"field": "longitude"},
+        "latitude": {"field": "latitude"},
+        "size": {
+          "field": "total_deaths",
+          "type": "quantitative",
+          "scale": {"type": "sqrt", "domain": [0, 20000], "range": [50, 2500]},
+          "legend": {
+            "title": "Total Deaths",
+            "orient": "right",
+            "values": [100, 5000, 10000, 15000, 20000],
+            "symbolFillColor": "gray"
+          },
+          "title": "Total Deaths"
+        },
+        "color": {
+          "field": "ethnicity",
+          "type": "nominal",
+          "scale": {
+            "domain": ["bumi_malay", "bumi_other", "chinese", "indian"],
+            "range": ["#0047AB", "#16a085", "#ff8c00", "#8e44ad"]
+          },
+          "legend": {"title": "Ethnicity"}
+        },
+        "shape": {
+          "field": "sex",
+          "type": "nominal",
+          "scale": {
+            "domain": ["both", "male", "female"],
+            "range": ["circle", "triangle-up", "square"]
+          },
+          "legend": {"title": "Gender"}
+        },
+        "tooltip": [
+          {"field": "state", "title": "State"},
+          {"field": "ethnicity", "title": "Ethnicity"},
+          {"field": "sex", "title": "Gender"},
+          {"field": "total_deaths", "title": "Total Deaths", "format": ","},
+          {"field": "year_extracted", "title": "Year"}
+        ]
+      }
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/Matessh/Data-Visualisation-2-/main/death_sex_ethnic_state_cleaned.csv",
+        "format": {"type": "csv"}
+      },
+      "transform": [
+        {"calculate": "year(datum.date)", "as": "year_extracted"},
+        {"filter": "datum.year_extracted == year_choice"},
+        {"filter": "datum.ethnicity == ethnic_choice"},
+        {
+          "filter": "(gender_choice == 'both' ? datum.sex == 'both' : datum.sex == gender_choice)"
+        },
+        {"calculate": "toNumber(datum.abs)", "as": "total_deaths"},
+        {
+          "joinaggregate": [
+            {"op": "max", "field": "total_deaths", "as": "max_deaths"}
+          ]
+        },
+        {"filter": "datum.total_deaths == datum.max_deaths"},
+        {
+          "lookup": "state",
+          "from": {
+            "data": {
+              "url": "https://raw.githubusercontent.com/Matessh/FIT3179-Week-9-Homework/main/malaysia-states.topojson",
+              "format": {"type": "topojson", "feature": "states"}
+            },
+            "key": "properties.Name",
+            "fields": ["geometry"]
+          }
+        },
+        {"calculate": "geoCentroid(null, datum.geometry)", "as": "centroid"},
+        {"calculate": "datum.centroid[0]", "as": "centroid_lon"},
+        {"calculate": "datum.centroid[1]", "as": "centroid_lat"},
+        {"calculate": "datum.centroid_lon + 3.0", "as": "label_lon"},
+        {"calculate": "datum.centroid_lat", "as": "label_lat"},
+        {
+          "calculate": "'Highest: ' + datum.state + ' (' + format(datum.total_deaths, ',') + ')'",
+          "as": "label_text"
+        }
+      ],
+      "layer": [
+        {
+          "mark": {"type": "rule", "stroke": "#343a40", "strokeWidth": 1.2},
+          "encoding": {
+            "longitude": {"field": "centroid_lon"},
+            "latitude": {"field": "centroid_lat"},
+            "longitude2": {"field": "label_lon"},
+            "latitude2": {"field": "label_lat"}
+          }
+        },
+        {
+          "mark": {
+            "type": "text",
+            "font": "Arial, sans-serif",
+            "fontSize": 13,
+            "fontWeight": "bold",
+            "align": "left",
+            "dx": 6,
+            "dy": -10,
+            "color": "#343a40"
+          },
+          "encoding": {
+            "longitude": {"field": "label_lon"},
+            "latitude": {"field": "label_lat"},
+            "text": {"field": "label_text"}
+          }
+        }
+      ]
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/Matessh/Data-Visualisation-2-/main/death_sex_ethnic_state_cleaned.csv",
+        "format": {"type": "csv"}
+      },
+      "transform": [
+        {"calculate": "year(datum.date)", "as": "year_extracted"},
+        {"filter": "datum.year_extracted == year_choice"},
+        {"filter": "datum.ethnicity == ethnic_choice"},
+        {
+          "filter": "(gender_choice == 'both' ? datum.sex == 'both' : datum.sex == gender_choice)"
+        },
+        {"calculate": "toNumber(datum.abs)", "as": "total_deaths"},
+        {
+          "joinaggregate": [
+            {"op": "min", "field": "total_deaths", "as": "min_deaths"}
+          ]
+        },
+        {"filter": "datum.total_deaths == datum.min_deaths"},
+        {
+          "lookup": "state",
+          "from": {
+            "data": {
+              "url": "https://raw.githubusercontent.com/Matessh/FIT3179-Week-9-Homework/main/malaysia-states.topojson",
+              "format": {"type": "topojson", "feature": "states"}
+            },
+            "key": "properties.Name",
+            "fields": ["geometry"]
+          }
+        },
+        {"calculate": "geoCentroid(null, datum.geometry)", "as": "centroid"},
+        {"calculate": "datum.centroid[0]", "as": "centroid_lon"},
+        {"calculate": "datum.centroid[1]", "as": "centroid_lat"},
+        {
+          "calculate": "datum.state == 'Perlis' ? datum.centroid_lon + 4.0 : datum.state == 'Labuan' ? datum.centroid_lon - 3 : datum.state == 'Sabah' ? datum.centroid_lon + 3.5 : datum.centroid_lon - 4.0",
+          "as": "label_lon"
+        },
+        {"calculate": "datum.centroid_lat", "as": "label_lat"},
+        {
+          "calculate": "'Lowest: ' + datum.state + ' (' + format(datum.total_deaths, ',') + ')'",
+          "as": "label_text"
+        }
+      ],
+      "layer": [
+        {
+          "mark": {"type": "rule", "stroke": "#0081a7", "strokeWidth": 1.2},
+          "encoding": {
+            "longitude": {"field": "centroid_lon"},
+            "latitude": {"field": "centroid_lat"},
+            "longitude2": {"field": "label_lon"},
+            "latitude2": {"field": "label_lat"}
+          }
+        },
+        {
+          "mark": {
+            "type": "text",
+            "font": "Arial, sans-serif",
+            "fontSize": 13,
+            "fontWeight": "bold",
+            "align": {"expr": "datum.state == 'Labuan' ? 'right' : 'left'"},
+            "dx": {
+              "expr": "datum.state == 'Labuan' ? -10 : datum.state == 'Putrajaya' ? 12 : 6"
+            },
+            "dy": {"expr": "datum.state == 'Putrajaya' ? 12 : 6"},
+            "color": "#0081a7"
+          },
+          "encoding": {
+            "longitude": {"field": "label_lon"},
+            "latitude": {"field": "label_lat"},
+            "text": {"field": "label_text"}
+          }
+        }
+      ]
+    }
+  ],
+  "config": {}
+}
