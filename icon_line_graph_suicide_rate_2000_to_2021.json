@@ -1,0 +1,410 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "Suicide Rates in Malaysia (Male vs Female, 2000 to 2021)",
+    "subtitle": "Each icon marks a data point; lines show trends over time",
+    "fontSize": 20,
+    "anchor": "start",
+    "font": "Georgia",
+    "subtitleFont": "Arial"
+  },
+  "width": 900,
+  "height": 450,
+  "background": "#fff8dcee",
+  "layer": [
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/Matessh/Data-Visualisation-2-/main/Malaysia-Suicide-Rate-Male-2025-10-14-13-04%20(1).csv",
+        "format": {
+          "type": "csv",
+          "parse": {"Year": "number", "Suicide_Rate": "number"}
+        }
+      },
+      "transform": [{"calculate": "'Male'", "as": "Gender"}],
+      "layer": [
+        {
+          "mark": {"type": "line", "interpolate": "monotone", "strokeWidth": 2},
+          "encoding": {
+            "x": {
+              "field": "Year",
+              "type": "quantitative",
+              "title": "Year",
+              "scale": {"domain": [2000, 2021]},
+              "axis": {"format": "d", "tickCount": 11}
+            },
+            "y": {
+              "field": "Suicide_Rate",
+              "type": "quantitative",
+              "title": "Suicide Rate (per 100,000)"
+            },
+            "color": {
+              "field": "Gender",
+              "type": "nominal",
+              "scale": {
+                "domain": ["Male", "Female"],
+                "range": ["#1f77b4", "#f30999"]
+              }
+            }
+          }
+        },
+        {
+          "mark": {"type": "image", "width": 20, "height": 20},
+          "encoding": {
+            "x": {"field": "Year", "type": "quantitative"},
+            "y": {"field": "Suicide_Rate", "type": "quantitative"},
+            "url": {
+              "value": "https://raw.githubusercontent.com/Matessh/Data-Visualisation-2-/main/avatar-design.png"
+            },
+            "tooltip": [
+              {
+                "field": "Year",
+                "type": "quantitative",
+                "title": "Year",
+                "format": "d"
+              },
+              {
+                "field": "Suicide_Rate",
+                "type": "quantitative",
+                "title": "Male Rate",
+                "format": ".2f"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/Matessh/Data-Visualisation-2-/main/Malaysia-Suicide-Rate-Female-2025-10-14-13-04%20(1).csv",
+        "format": {
+          "type": "csv",
+          "parse": {"Year": "number", "Suicide_Rate": "number"}
+        }
+      },
+      "transform": [{"calculate": "'Female'", "as": "Gender"}],
+      "layer": [
+        {
+          "mark": {"type": "line", "interpolate": "monotone", "strokeWidth": 2},
+          "encoding": {
+            "x": {
+              "field": "Year",
+              "type": "quantitative",
+              "title": "Year",
+              "scale": {"domain": [2000, 2021]},
+              "axis": {"format": "d", "tickCount": 11}
+            },
+            "y": {"field": "Suicide_Rate", "type": "quantitative"},
+            "color": {
+              "field": "Gender",
+              "type": "nominal",
+              "scale": {
+                "domain": ["Male", "Female"],
+                "range": ["#1f77b4", "#f30999"]
+              }
+            }
+          }
+        },
+        {
+          "mark": {"type": "image", "width": 20, "height": 20},
+          "encoding": {
+            "x": {"field": "Year", "type": "quantitative"},
+            "y": {"field": "Suicide_Rate", "type": "quantitative"},
+            "url": {
+              "value": "https://raw.githubusercontent.com/Matessh/Data-Visualisation-2-/main/woman.png"
+            },
+            "tooltip": [
+              {
+                "field": "Year",
+                "type": "quantitative",
+                "title": "Year",
+                "format": "d"
+              },
+              {
+                "field": "Suicide_Rate",
+                "type": "quantitative",
+                "title": "Female Rate",
+                "format": ".2f"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "mark": {"type": "image", "width": 25, "height": 25},
+      "encoding": {
+        "x": {"value": 840},
+        "y": {"value": 150},
+        "url": {
+          "value": "https://raw.githubusercontent.com/Matessh/Data-Visualisation-2-/main/avatar-design.png"
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "baseline": "middle",
+        "fontSize": 12,
+        "dx": 20,
+        "font": "Arial"
+      },
+      "encoding": {
+        "text": {"value": "Male"},
+        "x": {"value": 840},
+        "y": {"value": 150}
+      }
+    },
+    {
+      "mark": {"type": "image", "width": 25, "height": 25},
+      "encoding": {
+        "x": {"value": 840},
+        "y": {"value": 180},
+        "url": {
+          "value": "https://raw.githubusercontent.com/Matessh/Data-Visualisation-2-/main/woman.png"
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "baseline": "middle",
+        "fontSize": 12,
+        "dx": 20,
+        "font": "Arial"
+      },
+      "encoding": {
+        "text": {"value": "Female"},
+        "x": {"value": 840},
+        "y": {"value": 180}
+      }
+    },
+    {
+      "layer": [
+        {
+          "data": {
+            "values": [
+              {"x_start": 2014.5, "y_start": 8.4, "x_end": 2015, "y_end": 7}
+            ]
+          },
+          "layer": [
+            {
+              "mark": {"type": "rule", "color": "#1f77b4"},
+              "encoding": {
+                "x": {"field": "x_start", "type": "quantitative"},
+                "y": {"field": "y_start", "type": "quantitative"},
+                "x2": {"field": "x_end"},
+                "y2": {"field": "y_end"}
+              }
+            },
+            {
+              "mark": {
+                "type": "text",
+                "align": "right",
+                "dx": -5,
+                "dy": -5,
+                "fontSize": 12,
+                "color": "#1f77b4",
+                "font": "Arial",
+                "fontStyle": "italic"
+              },
+              "encoding": {
+                "x": {"field": "x_start", "type": "quantitative"},
+                "y": {"field": "y_start", "type": "quantitative"},
+                "text": {"value": "Sharp increase in male rates after 2014"}
+              }
+            }
+          ]
+        },
+        {
+          "data": {
+            "values": [
+              {"x_start": 2018, "y_start": 9.5, "x_end": 2021, "y_end": 8.95}
+            ]
+          },
+          "layer": [
+            {
+              "mark": {"type": "rule", "color": "#1f77b4"},
+              "encoding": {
+                "x": {"field": "x_start", "type": "quantitative"},
+                "y": {"field": "y_start", "type": "quantitative"},
+                "x2": {"field": "x_end"},
+                "y2": {"field": "y_end"}
+              }
+            },
+            {
+              "mark": {
+                "type": "text",
+                "align": "right",
+                "dx": -5,
+                "dy": -5,
+                "fontSize": 12,
+                "color": "#1f77b4",
+                "font": "Arial",
+                "fontStyle": "italic"
+              },
+              "encoding": {
+                "x": {"field": "x_start", "type": "quantitative"},
+                "y": {"field": "y_start", "type": "quantitative"},
+                "text": {"value": "Male rate peaks in 2021"}
+              }
+            }
+          ]
+        },
+        {
+          "data": {
+            "values": [
+              {"x_start": 2008, "y_start": 3.2, "x_end": 2012, "y_end": 2.1}
+            ]
+          },
+          "layer": [
+            {
+              "mark": {"type": "rule", "color": "#808080"},
+              "encoding": {
+                "x": {"field": "x_start", "type": "quantitative"},
+                "y": {"field": "y_start", "type": "quantitative"},
+                "x2": {"field": "x_end"},
+                "y2": {"field": "y_end"}
+              }
+            },
+            {
+              "mark": {
+                "type": "text",
+                "align": "left",
+                "dx": -200,
+                "dy": -5,
+                "fontSize": 12,
+                "color": "#808080",
+                "font": "Arial",
+                "fontStyle": "italic"
+              },
+              "encoding": {
+                "x": {"field": "x_start", "type": "quantitative"},
+                "y": {"field": "y_start", "type": "quantitative"},
+                "text": {"value": "Female rates remain relatively stable"}
+              }
+            }
+          ]
+        },
+        {
+          "data": {
+            "values": [
+              {"x_start": 2019, "y_start": 5.5, "x_end": 2020, "y_end": 6.3}
+            ]
+          },
+          "layer": [
+            {
+              "mark": {"type": "rule", "color": "#808080 "},
+              "encoding": {
+                "x": {"field": "x_start", "type": "quantitative"},
+                "y": {"field": "y_start", "type": "quantitative"},
+                "x2": {"field": "x_end"},
+                "y2": {"field": "y_end"}
+              }
+            },
+            {
+              "mark": {
+                "type": "text",
+                "align": "right",
+                "dx": -5,
+                "dy": 5,
+                "fontSize": 12,
+                "color": "#808080",
+                "font": "Arial",
+                "fontStyle": "italic"
+              },
+              "encoding": {
+                "x": {"field": "x_start", "type": "quantitative"},
+                "y": {"field": "y_start", "type": "quantitative"},
+                "text": {
+                  "value": "Significant dip in 2020 before reaching peak"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "data": {
+            "values": [
+              {"x_start": 2010, "y_start": 7.5, "x_end": 2014, "y_end": 6.2}
+            ]
+          },
+          "layer": [
+            {
+              "mark": {"type": "rule", "color": "#808080"},
+              "encoding": {
+                "x": {"field": "x_start", "type": "quantitative"},
+                "y": {"field": "y_start", "type": "quantitative"},
+                "x2": {"field": "x_end"},
+                "y2": {"field": "y_end"}
+              }
+            },
+            {
+              "mark": {
+                "type": "text",
+                "align": "right",
+                "dx": -5,
+                "dy": -5,
+                "fontSize": 12,
+                "color": "#808080",
+                "font": "Arial",
+                "fontStyle": "italic"
+              },
+              "encoding": {
+                "x": {"field": "x_start", "type": "quantitative"},
+                "y": {"field": "y_start", "type": "quantitative"},
+                "text": {"value": "Male rates were also stable before 2014"}
+              }
+            }
+          ]
+        },
+        {
+          "data": {
+            "values": [
+              {"x_start": 2019, "y_start": 1, "x_end": 2020, "y_end": 1.7}
+            ]
+          },
+          "layer": [
+            {
+              "mark": {"type": "rule", "color": "#f30999"},
+              "encoding": {
+                "x": {"field": "x_start", "type": "quantitative"},
+                "y": {"field": "y_start", "type": "quantitative"},
+                "x2": {"field": "x_end"},
+                "y2": {"field": "y_end"}
+              }
+            },
+            {
+              "mark": {
+                "type": "text",
+                "align": "right",
+                "dx": -5,
+                "dy": 5,
+                "fontSize": 12,
+                "color": "#f30999",
+                "font": "Arial",
+                "fontStyle": "italic"
+              },
+              "encoding": {
+                "x": {"field": "x_start", "type": "quantitative"},
+                "y": {"field": "y_start", "type": "quantitative"},
+                "text": {"value": "Lowest point for female rates in 2020"}
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "config": {
+    "axis": {
+      "labelFontSize": 12,
+      "titleFontSize": 14,
+      "grid": false,
+      "titleFont": "Arial",
+      "labelFont": "Arial"
+    },
+    "title": {"font": "sans-serif"}
+  }
+}
