@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mortality & Health Trends in Malaysia (2000-2023)</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Georgia:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            /* --- UPDATED FOR THEME --- */
+            background-color: #f8f9fa; /* Fallback light gray */
+            background-image: url('https://img.freepik.com/premium-photo/skull-background-copy-space_953680-15750.jpg'); /* 
+            background-repeat: no-repeat;
+            background-size: cover; /* Ensures image covers the entire body */
+            background-attachment: fixed; /* Keeps image static when scrolling */
+            /* ------------------------- */
+            font-family: 'Inter', sans-serif;
+            color: #090909;
+            min-width: 360px;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Georgia', serif;
+            color: #212529;
+        }
+
+        
+
+        /* Main content wrapper - centered, controls overall width */
+        .content-wrapper {
+            max-width: 1600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Container for each visualization "card" */
+        .vis-container {
+            background-color: #f5f5f5;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem; /* Standard padding */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            height: auto; /* Allow natural height */
+        }
+
+        /* Increased font size and line height for descriptions */
+        .vis-container p, .vis-container ul {
+            color: #495057;
+            margin-bottom: 1rem;
+            flex-shrink: 0;
+            font-size: 1.125rem; /* text-lg */
+            line-height: 1.75rem; /* Corresponding line height */
+        }
+        .vis-container ul {
+             margin-left: 1.5rem; /* Add indent for list */
+        }
+
+
+        /* Ensure the Vega-Lite divs take up available space */
+        .vis-embed {
+            width: 100%;
+            flex-grow: 1;
+            min-height: 550px; /* Consistent base height for charts */
+            position: relative;
+            display: block;
+        }
+
+        /* Specific taller min-height for maps */
+        #vis1.vis-embed, #vis2.vis-embed {
+            min-height: 700px;
+        }
+
+        footer {
+             color: #141414;
+        }
+
+        /* Color classes for highlighting text (using updated palette) */
+        .highlight-metric { color: #374151; font-weight: bold; } /* Dark Gray for metric names */
+        .highlight-data-high { color: #c37612; font-weight: bold; } /* Brown for high values/states */
+        .highlight-data-low { color: #1D4ED8; font-weight: bold; } /* Dark Blue for low values/states */
+        .highlight-key-term { font-weight: bold; } /* Just bold for general key terms */
+        .highlight-category-malay { color: #0047AB; font-weight: bold;} /* Match map color */
+        .highlight-category-other { color: #16A085; font-weight: bold;} /* Match map color */
+        .highlight-category-chinese { color: #FF8C00; font-weight: bold;} /* Match map color */
+        .highlight-category-indian { color: #8E44AD; font-weight: bold;} /* Match map color */
+        .highlight-gender-male { color: #0D9488; font-weight: bold;} /* Teal for male */
+        .highlight-gender-female { color: #c43b74; font-weight: bold;} /* Pink/Magenta for female */
+
+    </style>
+</head>
+
+<body class="p-6 md:p-12">
+    <div class="content-wrapper">
+
+        <header class="text-center mb-12">
+             <h1 class="text-4xl md:text-5xl font-bold mb-4">
+                 A Visual Story of Mortality in Malaysia
+             </h1>
+
+             <p class="text-lg md:text-xl max-w-4xl mx-auto" style="color: #FFFFFF;">
+                 In Malaysia, the state and demographic-specific uneven patterns in mortality can be observed within the years between 2013 and 2023.
+                 The west coast states tend to have a higher death rate and some of the ethnic or gender groups become disproportionately affected. Chronic problems such as  pneumonia and ischaemic heart diseases were the top threats when it comes to looking at what is causing these deaths, as of 2023.
+                 However, by moving back 2000-2021 we find a lower-prominence crisis, not rising suicide rates, but oscillating ones, particularly in males, reminding us that
+                 public health does not just concern the physical but the mental strength as well.
+             </p>
+         </header>
+
+        <div class="space-y-8 md:space-y-12">
+
+            <div class="vis-container">
+                <h2 class="text-2xl font-bold mb-2">1. Where Are We Dying? Mapping Death Rates Across Malaysia</h2>
+                    
+
+            <p>
+                Our journey begins with a geographic overview. This map visualizes the 
+                <span class="next-line"><span class="highlight-metric">Crude Death Rate (CDR)</span></span> - the number of deaths per 1,000 people <br> for each of the following Malaysian states.
+                The intensity of the red color directly reflects the death rate: 
+               <span class="next-line"><span class="highlight-data-high">darker shades indicate higher mortality</span></span>, <br> while lighter shades represent lower rates.
+                This allows for a quick visual assessment of regional health disparities.
+            </p>
+            <p>
+                Use the 
+               <span class="next-line"><span class="highlight-key-term">'Select Year' dropdown (covering 2013-2023)</span></span> to explore how patterns have evolved over the years. 
+                Data suggests states like <span class="next-line"><span class="highlight-data-high">Perlis</span></span> <br> and 
+                <span class="next-line"><span class="highlight-data-high">Perak</span></span> frequently exhibit 
+                <span class="next-line"><span class="highlight-data-high">consistently high death rates</span></span> (often above 7.0 or 8.0).
+                This trend could be linked to several factors, including  <br>
+                <span class="next-line"><span class="highlight-key-term">older population demographics</span></span> in these states compared to the national average,
+                potentially leading to a higher natural incidence of age-related  <br> illnesses. 
+                Variations in <span class="next-line"><span class="highlight-key-term">healthcare access and infrastructure</span></span>, particularly in more rural areas within these states, might also play a role.<br>
+                <br> Conversely, the federal territory of <span class="next-line"><span class="highlight-data-low">Putrajaya</span></span> consistently shows the 
+                <span class="next-line"><span class="highlight-data-low">lowest rates</span></span> (typically below 2.5),
+                likely influenced by its status as an  <br> administrative center with a 
+                <span class="next-line"><span class="highlight-key-term">predominantly younger, working-age population</span></span> and  possibly better  access to centralized health facilities. 
+               <br>  <span class="next-line"><span class="highlight-data-low">Selangor</span></span>, being highly urbanized with generally good healthcare access, also maintains <br> lower rates despite its large population,
+                though spikes can occur, note the significant increase across many states during 
+                <span class="next-line"><span class="highlight-key-term">2021</span></span> <br> (e.g., Perak peaked at 8.5, Selangor jumped to 6.0),
+                reflecting the severe impact of the COVID-19 pandemic.
+                The map automatically highlights <br> the states with the absolute 
+                <span class="next-line"><span class="highlight-data-high">highest</span></span> (dark border) and 
+                <span class="next-line"><span class="highlight-data-low">lowest</span></span> (blue border) CDR for the selected year.
+            </p>
+
+           <div id="vis1" class="vis-embed"></div>
+            </div>
+
+          <div class="vis-container">
+                <h2 class="text-2xl font-bold mb-2">2. Who Is Most Affected? Deaths by Ethnicity and Gender (2013-2023)</h2>
+                <p>
+                    This map shows <span class="highlight-key-term">who</span> is dying by visualizing the <span class="highlight-metric">absolute number of deaths</span> per state.
+                    It covers 2013-2023, broken down by ethnicity and gender. <br> The <span class="highlight-key-term">size</span> of the symbol represents the <span class="highlight-key-term">total death count</span>.
+                    This highlights areas with the largest overall mortality burden.
+                </p>
+                <p>
+                    The <span class="highlight-category-malay">Bumiputera Malay</span> group consistently shows the <span class="highlight-data-high">highest absolute death totals</span>. This aligns directly with them being the largest national demographic.
+                     <br> <span class="highlight-category-chinese">Chinese</span> residents often show the second-highest counts. This group typically has an <span class="highlight-key-term">older demographic profile</span>, increasing mortality risk.
+                    The <span class="highlight-category-other">Other <br> Bumiputera</span> group generally records the <span class="highlight-data-low">lowest absolute numbers</span> on the West Coast, reflecting their smaller population base.
+                    The overall <span class="highlight-key-term">male</span> death  <br> count is also consistently <span class="highlight-data-high">higher than female</span> counts, suggesting <span class="highlight-key-term">higher occupational and behavioral risks</span>.
+                    <span class="highlight-data-low">Putrajaya</span> and <span class="highlight-data-low">Labuan</span> always show the  <br> <span class="highlight-data-low">lowest absolute numbers</span> due to their small populations.
+                </p>
+                <ul class="list-disc">
+                     <li><strong>Year:</strong> See how total deaths change. Populous states (<span class="highlight-key-term">Selangor, Johor</span>) show large symbols. Note the larger symbols across states in <span class="highlight-key-term">2021</span>.</li>
+                     <li><strong>Ethnicity (<span class="highlight-key-term">Color</span>):</strong> Filter by <span class="highlight-category-malay">Bumiputera Malay</span>, <span class="highlight-category-other">Other Bumiputera</span>, <span class="highlight-category-chinese">Chinese</span>, <span class="highlight-category-indian">Indian</span>.</li>
+                     <li><strong>Gender (<span class="highlight-key-term">Shape</span>):</strong> Compare <span class="highlight-key-term">males</span> (▲), <span class="highlight-key-term">females</span> (■), or view the <span class="highlight-key-term">combined total</span> (●).</li>
+                </ul>
+                <div id="vis2" class="vis-embed"></div>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 md:gap-12">
+
+                <div class="vis-container">
+                    <h2 class="text-2xl font-bold mb-2">3. What Is Killing Us? Leading Causes in 2023</h2>
+                    <p>
+                       After exploring 'where' and 'who', this chart identifies <strong>what</strong> were the principal causes of death in Malaysia for 2023. It ranks the <span class="highlight-metric">leading causes</span> based on the total number of recorded deaths.
+                    </p>
+                    <p>
+                        <span class="highlight-data-high">Pneumonia</span> (🫁) clearly stands out as the predominant cause (<span class="highlight-data-high">with 18,181 deaths</span>). <span class="highlight-data-high">Ischaemic Heart Diseases</span> (🫀) follows as the second leading cause (<span class="highlight-data-high">with 18,121 deaths</span>). Other major contributors include Cerebrovascular Diseases (🧠) and various forms of Cancer (💀). This provides a snapshot of the primary disease burdens.
+                    </p>
+                    <div id="vis3" class="vis-embed"></div>
+                </div>
+
+                <div class="vis-container">
+                    <h2 class="text-2xl font-bold mb-2">4. The Quiet Crisis: Suicide Trends (2000-2021)</h2>
+                    <p>
+                        Shifting focus to <span class="highlight-metric">mental health</span>, this chart tracks the <strong>suicide rate (per 100,000 population)</strong> over two decades, comparing trends between <span class="highlight-gender-male">males</span> (blue line) and <span class="highlight-gender-female">females</span> (pink line). Data extends to 2021, reflecting reporting lags and capturing the COVID-19 pandemic impact on mental health.
+                    </p>
+                     <p>
+                        This long-term view reveals a stark <span class="highlight-key-term">gender disparity</span>. Female rates remain consistently low (generally <span class="highlight-data-low">below 2.5</span> per 100,000), whereas male rates are substantially <span class="highlight-data-high">higher</span> and more volatile, peaking near <span class="highlight-data-high">9.0</span> per 100,000 in <span class="highlight-key-term">2021</span> which is three times more than the female. This highlights a significant public health concern, particularly for men.
+                    </p>
+                    <div id="vis4" class="vis-embed"></div>
+                </div>
+
+            </div> </div> 
+            
+          <footer class="text-center mt-12 text-white text-sm max-w-4xl mx-auto">
+    <p class="mb-2 font-semibold">
+        Visualizations created by Matessh Subramaniam [Student ID: 34539816] with Vega-Lite.
+    </p>
+    <p class="text-white text-xs leading-relaxed">
+        <strong>Data Sources:</strong><br>
+        - data.gov.my (Annual Deaths By State (2013–2023) and Annual Deaths By State, Sex, & Ethnicity)<br>
+          <a href="https://data.gov.my/data-catalogue/deaths_state" class="underline text-white">deaths_state</a> &nbsp;|&nbsp;
+          <a href="https://data.gov.my/data-catalogue/deaths_sex_ethnic_state" class="underline text-white">deaths_sex_ethnic_state</a><br>
+        - Macrotrends (2000–2021 Suicide Rates)<br>
+          <a href="https://www.macrotrends.net/global-metrics/countries/mys/malaysia/suicide-rate" class="underline text-white">macrotrends.net</a><br>
+        - DOSM (Leading Causes of Deaths in Malaysia, 2023)<br>
+          <a href="https://www.dosm.gov.my/uploads/release-content/file_20241029114439.pdf" class="underline text-white">DOSM PDF</a><br>
+        - Background Image Source:<br>
+          <a href="https://img.freepik.com/premium-photo/skull-background-copy-space_953680-15750.jpg" class="underline text-white">Freepik</a><br><br>
+        To access all of these, visit my GitHub repository:<br>
+        <a href="https://github.com/Matessh/Data-Visualisation-2-" class="underline text-white">github.com/Matessh/Data-Visualisation-2-</a>
+    </p>
+</footer>
+
+
+
+    </div> <script>
+        // --- URLs ---
+        // Ensure map JSONs use fixed width/height and an appropriate projection.scale/center
+        const vis1_url = "https://raw.githubusercontent.com/Matessh/Data-Visualisation-2-/refs/heads/main/malaysian_death_rate_2023_map.json"; // Make sure this uses the JSON with fixed dimensions & adjusted projection
+        const vis2_url = "https://raw.githubusercontent.com/Matessh/Data-Visualisation-2-/refs/heads/main/proportional_symbol_map_death_rate_by_ethinicity.json"; // Make sure this uses appropriate fixed dimensions & adjusted projection
+        const vis3_url = "https://raw.githubusercontent.com/Matessh/Data-Visualisation-2-/refs/heads/main/malaysia_deaths_lollipop_chart.json";
+        const vis4_url = "https://raw.githubusercontent.com/Matessh/Data-Visualisation-2-/refs/heads/main/icon_line_graph_suicide_rate_2000_to_2021.json";
+
+        // --- Embed ---
+        const embedOptions = {
+            "actions": false,
+            "renderer": "svg"
+        };
+
+        vegaEmbed('#vis1', vis1_url, embedOptions).catch(console.error);
+        vegaEmbed('#vis2', vis2_url, embedOptions).catch(console.error);
+        vegaEmbed('#vis3', vis3_url, embedOptions).catch(console.error);
+        vegaEmbed('#vis4', vis4_url, embedOptions).catch(console.error);
+    </script>
+</body>
+</html>
