@@ -1,0 +1,324 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 1100,
+  "height": 700,
+  "background": "#fff8dcee",
+  "projection": {"type": "mercator",  "center": [107.5, 3.5], "scale": 2400},
+  "view": {"stroke": null},
+  "title": {
+    "text": {
+      "signal": "'Death Rate by State in Malaysia (' + year_choice + ')'"
+    },
+    "font": "Georgia",
+    "fontSize": 24,
+    "fontWeight": "bold",
+    "anchor": "middle",
+    "color": "#4b3832",
+    "subtitle": [
+      "Crude Death Rate (per 1,000 population)",
+      "Use the dropdown menu to explore the data by year"
+    ],
+    "subtitleFont": "arial",
+    "subtitleFontSize": 14,
+    "subtitleColor": "#4b3832"
+  },
+  "params": [
+    {
+      "name": "year_choice",
+      "value": 2023,
+      "bind": {
+        "input": "select",
+        "name": "Select Year: ",
+        "options": [
+          2013,
+          2014,
+          2015,
+          2016,
+          2017,
+          2018,
+          2019,
+          2020,
+          2021,
+          2022,
+          2023
+        ]
+      }
+    }
+  ],
+  "layer": [
+    {
+      "data": {"graticule": {"step": [5, 5]}},
+      "mark": {
+        "type": "geoshape",
+        "filled": false,
+        "stroke": "darkgoldenrod",
+        "strokeWidth": 0.6
+      }
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/Matessh/FIT3179-Week-9-Homework/main/malaysia-states.topojson",
+        "format": {"type": "topojson", "feature": "states"}
+      },
+      "mark": {"type": "geoshape", "fill": "white", "stroke": "#faf0e6"}
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/Matessh/FIT3179-Week-9-Homework/main/death_state_cleaned.csv",
+        "format": {"type": "csv"}
+      },
+      "transform": [
+        {
+          "calculate": "toNumber(trim(split(datum.date, '/')[2]))",
+          "as": "year_choice_extracted"
+        },
+        {"filter": "datum.year_choice_extracted == year_choice"},
+        {"calculate": "toNumber(datum.rate)", "as": "death_rate"},
+        {"calculate": "toNumber(datum.abs)", "as": "total_deaths"},
+        {
+          "joinaggregate": [
+            {"op": "max", "field": "death_rate", "as": "max_death_rate"},
+            {"op": "min", "field": "death_rate", "as": "min_death_rate"}
+          ]
+        },
+        {
+          "lookup": "state",
+          "from": {
+            "data": {
+              "url": "https://raw.githubusercontent.com/Matessh/FIT3179-Week-9-Homework/main/malaysia-states.topojson",
+              "format": {"type": "topojson", "feature": "states"}
+            },
+            "key": "properties.Name",
+            "fields": ["type", "geometry"]
+          }
+        }
+      ],
+      "mark": {"type": "geoshape", "stroke": "white", "strokeWidth": 0.5},
+      "encoding": {
+        "color": {
+          "field": "death_rate",
+          "type": "quantitative",
+          "scale": {"scheme": "reds"},
+          "title": "Death Rate (per 1,000)",
+          "legend": {
+            "orient": "right",
+            "labelFontSize": 11,
+            "titleFontSize": 12,
+            "gradientLength": 200
+          }
+        },
+        "stroke": {
+          "condition": [
+            {
+              "test": "datum.death_rate == datum.max_death_rate",
+              "value": "#343a40"
+            }
+          ],
+          "value": "white"
+        },
+        "strokeWidth": {
+          "condition": [
+            {"test": "datum.death_rate == datum.max_death_rate", "value": 3}
+          ],
+          "value": 0.5
+        },
+        "tooltip": [
+          {"field": "state", "type": "nominal", "title": "State"},
+          {
+            "field": "total_deaths",
+            "type": "quantitative",
+            "title": "Total Deaths",
+            "format": ","
+          },
+          {
+            "field": "death_rate",
+            "type": "quantitative",
+            "title": "Death Rate (per 1,000)",
+            "format": ".2f"
+          },
+          {"field": "year_choice_extracted", "type": "ordinal", "title": "Year"}
+        ]
+      }
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/Matessh/FIT3179-Week-9-Homework/main/death_state_cleaned.csv",
+        "format": {"type": "csv"}
+      },
+      "transform": [
+        {
+          "calculate": "toNumber(trim(split(datum.date, '/')[2]))",
+          "as": "year_choice_extracted"
+        },
+        {"filter": "datum.year_choice_extracted == year_choice"},
+        {"calculate": "toNumber(datum.rate)", "as": "death_rate"},
+        {
+          "joinaggregate": [
+            {"op": "max", "field": "death_rate", "as": "max_death_rate"}
+          ]
+        },
+        {"filter": "datum.death_rate == datum.max_death_rate"},
+        {
+          "lookup": "state",
+          "from": {
+            "data": {
+              "url": "https://raw.githubusercontent.com/Matessh/FIT3179-Week-9-Homework/main/malaysia-states.topojson",
+              "format": {"type": "topojson", "feature": "states"}
+            },
+            "key": "properties.Name",
+            "fields": ["type", "geometry"]
+          }
+        },
+        {"calculate": "geoCentroid(null, datum.geometry)", "as": "centroid"},
+        {"calculate": "datum.centroid[0]", "as": "centroid_lon"},
+        {"calculate": "datum.centroid[1]", "as": "centroid_lat"},
+        {"calculate": "datum.centroid_lon + 3.0", "as": "label_lon"},
+        {"calculate": "datum.centroid_lat", "as": "label_lat"},
+        {
+          "calculate": "'Highest: ' + datum.state + ' (' + format(datum.death_rate, '.1f') + ')'",
+          "as": "label_text"
+        }
+      ],
+      "layer": [
+        {
+          "mark": {"type": "rule", "stroke": "#343a40", "strokeWidth": 1.2},
+          "encoding": {
+            "longitude": {"field": "centroid_lon"},
+            "latitude": {"field": "centroid_lat"},
+            "longitude2": {"field": "label_lon"},
+            "latitude2": {"field": "label_lat"}
+          }
+        },
+        {
+          "mark": {
+            "type": "text",
+            "fontSize": 13,
+            "fontWeight": "bold",
+            "align": "left",
+            "dx": 6,
+            "dy": -10,
+            "color": "#343a40",
+            "font": "Arial, sans-serif"
+          },
+          "encoding": {
+            "longitude": {"field": "label_lon"},
+            "latitude": {"field": "label_lat"},
+            "text": {"field": "label_text"}
+          }
+        }
+      ]
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/Matessh/FIT3179-Week-9-Homework/main/death_state_cleaned.csv",
+        "format": {"type": "csv"}
+      },
+      "transform": [
+        {
+          "calculate": "toNumber(trim(split(datum.date, '/')[2]))",
+          "as": "year_choice_extracted"
+        },
+        {"filter": "datum.year_choice_extracted == year_choice"},
+        {"calculate": "toNumber(datum.rate)", "as": "viz_death_rate"},
+        {
+          "joinaggregate": [
+            {"op": "min", "field": "viz_death_rate", "as": "viz_min_death_rate"}
+          ]
+        },
+        {"filter": "datum.viz_death_rate == datum.viz_min_death_rate"},
+        {
+          "lookup": "state",
+          "from": {
+            "data": {
+              "url": "https://raw.githubusercontent.com/Matessh/FIT3179-Week-9-Homework/main/malaysia-states.topojson",
+              "format": {"type": "topojson", "feature": "states"}
+            },
+            "key": "properties.Name",
+            "fields": ["type", "geometry"]
+          }
+        }
+      ],
+      "mark": {
+        "type": "geoshape",
+        "stroke": "#0081a7",
+        "strokeWidth": 1.5,
+        "fill": null,
+        "fillOpacity": 0
+      }
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/Matessh/FIT3179-Week-9-Homework/main/death_state_cleaned.csv",
+        "format": {"type": "csv"}
+      },
+      "transform": [
+        {
+          "calculate": "toNumber(trim(split(datum.date, '/')[2]))",
+          "as": "year_choice_extracted"
+        },
+        {"filter": "datum.year_choice_extracted == year_choice"},
+        {"calculate": "toNumber(datum.rate)", "as": "viz_death_rate"},
+        {
+          "joinaggregate": [
+            {"op": "min", "field": "viz_death_rate", "as": "viz_min_death_rate"}
+          ]
+        },
+        {"filter": "datum.viz_death_rate == datum.viz_min_death_rate"},
+        {
+          "lookup": "state",
+          "from": {
+            "data": {
+              "url": "https://raw.githubusercontent.com/Matessh/FIT3179-Week-9-Homework/main/malaysia-states.topojson",
+              "format": {"type": "topojson", "feature": "states"}
+            },
+            "key": "properties.Name",
+            "fields": ["type", "geometry"]
+          }
+        },
+        {"calculate": "geoCentroid(null, datum.geometry)", "as": "centroid"},
+        {"calculate": "datum.centroid[0]", "as": "centroid_lon"},
+        {"calculate": "datum.centroid[1]", "as": "centroid_lat"},
+        {
+          "calculate": "datum.state == 'Labuan' ? datum.centroid_lon - 3 : datum.state == 'Sabah' ? datum.centroid_lon + 3.5 : datum.centroid_lon - 4.0",
+          "as": "viz_label_lon"
+        },
+        {"calculate": "datum.centroid_lat", "as": "viz_label_lat"},
+        {
+          "calculate": "'Lowest: ' + datum.state + ' (' + format(datum.viz_death_rate, '.1f') + ')'",
+          "as": "viz_label_text"
+        }
+      ],
+      "layer": [
+        {
+          "mark": {"type": "rule", "stroke": "#0081a7", "strokeWidth": 1.2},
+          "encoding": {
+            "longitude": {"field": "centroid_lon"},
+            "latitude": {"field": "centroid_lat"},
+            "longitude2": {"field": "viz_label_lon"},
+            "latitude2": {"field": "viz_label_lat"}
+          }
+        },
+        {
+          "mark": {
+            "type": "text",
+            "fontSize": 13,
+            "fontWeight": "bold",
+            "align": {"expr": "datum.state == 'Labuan' ? 'right' : 'left'"},
+            "dx": {
+              "expr": "datum.state == 'Labuan' ? -10 : datum.state == 'Putrajaya' ? 12 : 6"
+            },
+            "dy": {"expr": "datum.state == 'Putrajaya' ? 12 : 6"},
+            "color": "#0081a7",
+            "font": "Arial, sans-serif"
+          },
+          "encoding": {
+            "longitude": {"field": "viz_label_lon"},
+            "latitude": {"field": "viz_label_lat"},
+            "text": {"field": "viz_label_text"}
+          }
+        }
+      ]
+    }
+  ],
+  "config": {}
+}
